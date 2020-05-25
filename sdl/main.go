@@ -16,19 +16,10 @@ const (
 )
 
 const (
-	RuneSq       = '■'
-	RuneDArrow   = '↓'
-	RuneLArrow   = '←'
-	RuneRArrow   = '→'
-	RuneUArrow   = '↑'
-	RuneDiamond  = '◆'
-	RunePi       = 'π'
-	RuneHLine    = '─'
-	RuneLLCorner = '└'
-	RuneLRCorner = '┘'
-	RuneULCorner = '┌'
-	RuneURCorner = '┐'
-	RuneVLine    = '│'
+	RuneDArrow = '↓'
+	RuneLArrow = '←'
+	RuneRArrow = '→'
+	RuneUArrow = '↑'
 )
 
 const (
@@ -36,7 +27,6 @@ const (
 	DOWN  = RuneDArrow
 	LEFT  = RuneLArrow
 	RIGHT = RuneRArrow
-	FOOD  = RunePi
 )
 
 var (
@@ -76,7 +66,6 @@ var (
 
 type snake struct {
 	bodySegmentPositions []sdl.Rect
-	segmentChar          rune
 	userDirection        rune
 	heading              rune
 }
@@ -89,7 +78,6 @@ type segment struct {
 func newSnake() snake {
 	return snake{
 		bodySegmentPositions: []sdl.Rect{newBodySegment(330, 250), newBodySegment(320, 250), newBodySegment(310, 250)}, //initial position for snakeBoi
-		segmentChar:          RuneSq,
 		userDirection:        0,
 		heading:              RIGHT,
 	}
@@ -105,13 +93,7 @@ func (s *snake) move() error {
 	}
 	head := newBodySegment(0, 0)
 	head.X, head.Y = s.calculatePosition(s.bodySegmentPositions[0].X, s.bodySegmentPositions[0].Y)
-	//fmt.Printf("current head at %d,%d heading %s user sent %s - new head at %d,%d\r\n",
-	//	s.bodySegmentPositions[0].x,
-	//	s.bodySegmentPositions[0].y,
-	//	string(s.heading),
-	//	string(s.userDirection),
-	//	head.x,
-	//	head.y)
+
 	collision := checkWallCollision(head)
 	if collision {
 		sdl.Delay(2000)
@@ -198,14 +180,13 @@ func drawBoarder(r *sdl.Renderer) {
 }
 
 func placeFood() {
-
+	//Try to place food, if random location occupied by snake keep trying
 	for {
 		randX := int32(Places[rand.Intn(len(Places))])
 		randY := int32(Places[rand.Intn(len(Places))])
 
 		if !snakeBoi.overlapsWithSegment(randX, randY) {
 			FoodLocation = newBodySegment(randX, randY)
-			//fmt.Println("Food placed at", FoodLocation,"\n",Places)
 			break
 		}
 
@@ -254,7 +235,7 @@ func drawDeadScreen(r *sdl.Renderer) {
 	os.Exit(0)
 }
 
-func processSnake(r *sdl.Renderer) {
+func runGame(r *sdl.Renderer) {
 	if !FoodPlaced {
 		placeFood()
 		FoodPlaced = true
@@ -281,7 +262,6 @@ func init() {
 }
 
 func main() {
-
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		log.Fatal(err)
 	}
@@ -307,12 +287,6 @@ func main() {
 
 	_ = surface.FillRect(nil, 0)
 
-	//rect := sdl.Rect{X: 300, Y: 10, W: 10, H: 10}
-
-	//_ = surface.FillRect(&rect, 0xffff0000)
-	//_ = window.UpdateSurface()
-	//renderer.SetDrawColor(0xff, 0xff, 0xff, 0xff)
-
 	snakeBoi = newSnake()
 
 	running := true
@@ -334,9 +308,7 @@ func main() {
 			}
 		}
 
-		processSnake(renderer)
+		runGame(renderer)
 
 	}
 }
-
-//todo, move collision detection logic to good place

@@ -121,7 +121,7 @@ func (s *snake) move() error {
 	bodyCollision := s.overlapsWithSegment(head.X, head.Y)
 	if bodyCollision {
 		sdl.Delay(2000)
-		return fmt.Errorf("Hit a yourself, you ded 🐍")
+		return fmt.Errorf("Hit yourself, you ded 🐍")
 	}
 
 	s.bodySegmentPositions = append([]sdl.Rect{head}, s.bodySegmentPositions...)
